@@ -306,7 +306,7 @@ void GetNextToken(CompilerInfo* pci, Token* ptoken)
 // stmtseq -> stmt { ; stmt }
 // stmt -> ifstmt | repeatstmt | assignstmt | readstmt | writestmt
 // ifstmt -> if exp then stmtseq [ else stmtseq ] end
-// <forstmt> -> for <identifier> from <mathexpr> to <mathexpr> inc <mathexpr> startfor <stmtseq> endfor
+// <forstmt> -> for <identifier> from <mathexpr> to <mathexpr> inc <mathexpr> startfor <stmtseq> endfor // BNF Logic for for loop
 // repeatstmt -> repeat stmtseq until expr
 // assignstmt -> identifier := expr
 // readstmt -> read identifier
@@ -615,25 +615,25 @@ TreeNode* IfStmt(CompilerInfo* pci, ParseInfo* ppi)
 // <forstmt> -> for <identifier> from <mathexpr> to <mathexpr> inc <mathexpr> startfor <stmtseq> endfor
 TreeNode* ForStmt(CompilerInfo* pci, ParseInfo* ppi)
 {
-    pci->debug_file.Out("Start ForStmt");
+    pci->debug_file.Out("Start ForStmt");   // Declare the start of for loop statement
 
-    TreeNode* tree=new TreeNode;
-    tree->node_kind=FOR_NODE;
-    tree->line_num=pci->in_file.cur_line_num;
+    TreeNode* tree=new TreeNode; // create new node for for loop
+    tree->node_kind=FOR_NODE;    // node kind will be for loop node
+    tree->line_num=pci->in_file.cur_line_num;   // declare the number of the line
 
-    Match(pci, ppi, FOR);
+    Match(pci, ppi, FOR);   // skip for word in the program
 
-    if(ppi->next_token.type==ID) AllocateAndCopy(&tree->id, ppi->next_token.str);
-    Match(pci, ppi, ID);
+    if(ppi->next_token.type==ID) AllocateAndCopy(&tree->id, ppi->next_token.str);   // set the id with the variable of for loop
+    Match(pci, ppi, ID);    // skip the identifier in the program
 
-    Match(pci, ppi, FROM); tree->child[0]=MathExpr(pci, ppi);
-    Match(pci, ppi, TO); tree->child[1]=MathExpr(pci, ppi);
-    Match(pci, ppi, INC); tree->child[2]=MathExpr(pci, ppi);
-    Match(pci, ppi, STARTFOR); tree->child[3]=StmtSeq(pci, ppi);
-    Match(pci, ppi, ENDFOR);
+    Match(pci, ppi, FROM); tree->child[0]=MathExpr(pci, ppi); // skip FROM word from the program and add this word as a child
+    Match(pci, ppi, TO); tree->child[1]=MathExpr(pci, ppi);   // skip TO word from the program and add this word as a child
+    Match(pci, ppi, INC); tree->child[2]=MathExpr(pci, ppi);  // skip INC word from the program and add this word as a child
+    Match(pci, ppi, STARTFOR); tree->child[3]=StmtSeq(pci, ppi); // skip STARTFOR word from the program and add this word as a child
+    Match(pci, ppi, ENDFOR);    // skip ENDFOR word from the program and add this word as a child
 
-    pci->debug_file.Out("End ForStmt");
-    return tree;
+    pci->debug_file.Out("End ForStmt"); // Declare the end of the loop statement
+    return tree; // return the node
 }
 
 // stmt -> ifstmt | repeatstmt | assignstmt | readstmt | writestmt
@@ -649,7 +649,7 @@ TreeNode* Stmt(CompilerInfo* pci, ParseInfo* ppi)
     else if(ppi->next_token.type==READ) tree=ReadStmt(pci, ppi);
     else if(ppi->next_token.type==WRITE) tree=WriteStmt(pci, ppi);
         // Code Added
-    else if(ppi->next_token.type==FOR) tree= ForStmt(pci, ppi);
+    else if(ppi->next_token.type==FOR) tree= ForStmt(pci, ppi); // if the token type is FOR then invoke ForStmt function
     else throw 0;
 
     pci->debug_file.Out("End Stmt");
@@ -663,12 +663,12 @@ TreeNode* StmtSeq(CompilerInfo* pci, ParseInfo* ppi)
 
     TreeNode* first_tree=Stmt(pci, ppi);
     TreeNode* last_tree=first_tree;
-
+    // Code Added
     // If we did not reach one of the Follow() of StmtSeq(), we are not done yet
     while(ppi->next_token.type!=ENDFILE && ppi->next_token.type!=END &&
           ppi->next_token.type!=ELSE && ppi->next_token.type!=UNTIL &&
           ppi->next_token.type!=FOR && ppi->next_token.type!=FROM &&
-          ppi->next_token.type!=TO && ppi->next_token.type!=INC &&
+          ppi->next_token.type!=TO && ppi->next_token.type!=INC &&              // if token type is one of this words then we are in the end of the stmtSeq
           ppi->next_token.type!=STARTFOR && ppi->next_token.type!=ENDFOR &&
           ppi->next_token.type!=BREAK)
     {
@@ -929,7 +929,7 @@ void RunProgram(TreeNode* node, SymbolTable* symbol_table, int* variables)
         if(cond)
         {
             if(node->child[1]) RunProgram(node->child[1], symbol_table, variables);
-            if (node->b) breakFlag= true;
+            if (node->b) breakFlag= true; // if this if has break statement then set breakFlag=True
         }
         else if(node->child[2]) RunProgram(node->child[2], symbol_table, variables);
     }
@@ -959,36 +959,38 @@ void RunProgram(TreeNode* node, SymbolTable* symbol_table, int* variables)
     // Code Added
     if(node->node_kind==FOR_NODE)
     {
-        int from = Evaluate(node->child[0], symbol_table, variables);
-        int to = Evaluate(node->child[1], symbol_table, variables);
-        int inc = Evaluate(node->child[2], symbol_table, variables);
-        variables[symbol_table->Find(node->id)->memloc]=from;
-        if (from > to)
+        int from = Evaluate(node->child[0], symbol_table, variables); // get the start value of for loop
+        int to = Evaluate(node->child[1], symbol_table, variables);   // get the end value of for loop
+        int inc = Evaluate(node->child[2], symbol_table, variables);  // get the value of inc of for loop
+        variables[symbol_table->Find(node->id)->memloc]=from;               // set the value of for loop var to from
+        if (from > to) // if from > to then this is decrement for loop
         {
             for (int i = from; i > to; i+= inc)
             {
-                variables[symbol_table->Find(node->id)->memloc]=i;
-                RunProgram(node->child[3], symbol_table, variables);
-                if (breakFlag)
+                variables[symbol_table->Find(node->id)->memloc]=i; // set the value of for loop var to i
+                RunProgram(node->child[3], symbol_table, variables); // run the body of for loop
+
+                i = variables[symbol_table->Find(node->id)->memloc]; // set i to the value of var in the symbol table
+                if (breakFlag) // after body execution check if breakFlag = true
                 {
-                    breakFlag=false;
-                    break;
+                    breakFlag=false; // set breakFlag to false
+                    break; // make the actual break logic
                 }
-                i = variables[symbol_table->Find(node->id)->memloc];
             }
         }
-        else if (from < to)
+        else if (from < to) // if from < to then this is increment for loop
         {
             for (int i = from; i < to; i+= inc)
             {
-                variables[symbol_table->Find(node->id)->memloc]=i;
-                RunProgram(node->child[3], symbol_table, variables);
-                if (breakFlag)
+                variables[symbol_table->Find(node->id)->memloc]=i; // set the value of for loop var to i
+                RunProgram(node->child[3], symbol_table, variables); // run the body of for loop
+
+                i = variables[symbol_table->Find(node->id)->memloc]; // set i to the value of var in the symbol table
+                if (breakFlag) // after body execution check if breakFlag = true
                 {
-                    breakFlag=false;
-                    break;
+                    breakFlag=false; // set breakFlag to false
+                    break; // make the actual break logic
                 }
-                i = variables[symbol_table->Find(node->id)->memloc];
             }
         }
 
