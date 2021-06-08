@@ -1,0 +1,58 @@
+int ia; int ib; int ic;                         { declare three integer variables }
+{int ia }                                       { raise duplicate variable declaration error }
+real ra; real rb; real rc;                      { declare three double variables }
+bool ba; bool bb; bool bc;                      { declare three boolean variables }
+
+read ia; read ib; read ic;                      { read the three integer variables }
+read ra; read rb; read rc;                      { read the three double variables }
+read ba; read bb; read bc;                      { read the three boolean variables }
+
+write ia+ib+ic;                                 { operations between integer variables }
+write ia-ib-ic;                                 { operations between integer variables }
+write ia*ib*ic;                                 { operations between integer variables }
+write ia/ib/ic;                                 { operations between integer variables }
+
+write ra+rb+rc;                                 { operations between double variables }
+write ra-rb-rc;                                 { operations between double variables }
+write ra*rb*rc;                                 { operations between double variables }
+write ra/rb/rc;                                 { operations between double variables }
+
+
+{ write ra + ia;}                               { this will fail if uncommented (operation between different type)}
+{ write ra + ba;}                               { this will fail if uncommented (operation between different type)}
+
+if ba then write 5 + 60 end;                    { if ba equal true print 65 }
+if bb then write 60.5 + 80.6 end;               { if ba equal true do print the value }
+if bc then write 3 end;                         { if ba equal true print 3 }
+
+if ba = bb then                                 { if ba equals bb then check if ba equals bc then print 123 }
+    if ba = bc then
+        write 123
+    end
+end;
+
+int n; int i; bool equal;                       { declare new three variable }
+i := 0;                                         { set i equals zero }
+read n;                                         { read in n value }
+repeat                                          { start of while loop }
+    write i;                                    { print i value }
+     equal:= i = n;                             { set equals to the return value of i == n }
+     write equal                                { print equal }
+until equal = 0;                                { condition of the while loop }
+
+
+int ctr;                                        { declare a integer variable }
+{ write x; }                                    { write undefined variable , will crash if uncommented }
+{ ctr := x }                                    { write assign to undefined variable , will crash if uncommented }
+{ write 5.5 + 10; }                             { raise error if uncommented }
+int result;                                     { declare a integer variable }
+ctr := 10;                                      { set 10 to ctr }
+
+if 0<ctr then                                   { compute only if ctr>=1 }
+  result := ctr;                                { set result = ctr }
+  repeat                                        { start repeat statement }
+    result := result + 1;                       { increase result by 1 }
+    write result;                               { write result "this will print Values from 11 to 20" }
+    ctr:=ctr-1                                  { decrease ctr by 1 }
+  until ctr=0                                   { end repeat }
+end

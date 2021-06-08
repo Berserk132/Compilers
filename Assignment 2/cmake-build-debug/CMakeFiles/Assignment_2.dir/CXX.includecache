@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+D:/FCAI/FCAI-Year4-T2/Compilers/Assignment/Assignment 2/main.cpp
+iostream
+-
+cstdio
+-
+cstdlib
+-
+cstring
+-
+
