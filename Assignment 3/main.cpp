@@ -391,6 +391,7 @@ void GetNextToken(CompilerInfo* pci, Token* ptoken)
 // ifstmt -> if exp then stmtseq [ else stmtseq ] end
 // <forstmt> -> for <identifier> from <mathexpr> to <mathexpr> inc <mathexpr> startfor <stmtseq> endfor // BNF Logic for for loop
 // repeatstmt -> repeat stmtseq until expr
+// repeatstmt -> break
 // assignstmt -> identifier := expr
 // readstmt -> read identifier
 // writestmt -> write expr
