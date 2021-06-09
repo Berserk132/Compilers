@@ -1161,7 +1161,7 @@ Start Match
 Start Stmt
 Start IfStmt
 Start Match
-[90] 1 (Num)
+[90] 0 (Num)
 Start Expr
 Start MathExpr
 Start Term
@@ -1224,7 +1224,8 @@ End WriteStmt
 End Stmt
 End StmtSeq
 Start Match
-[92]  (EndFile)
+[95] for (For)
 End ForStmt
 End Stmt
 End StmtSeq
+Error code ends before file ends

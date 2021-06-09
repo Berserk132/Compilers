@@ -6,11 +6,13 @@
 using namespace std;
 
 /*
+
+// Using 0-1 mehtod in negative for loop
 { Sample program
   in TINY language
   compute factorial
 }
-
+// Using 0-1 mehtod in negative for loop
 sum:=0;
 n:=20;
 i := 0;
@@ -103,6 +105,12 @@ startfor
     if 0<tmp/100 then break end;
     write tmp
 endfor
+
+{ for loop well produce error because k not declared before }
+for k from 1 to 5 inc 1
+startfor
+    write k
+endfor}
 */
 
 // sequence of statements separated by ;
@@ -434,7 +442,7 @@ struct TreeNode
     ExprDataType expr_data_type; // defined for expression/int/identifier only
     bool b = false;
     int line_num;
-    int line_break_num = -1;
+    int signal = -1;
 
     TreeNode() {int i; for(i=0;i<MAX_CHILDREN;i++) child[i]=0; sibling=0; expr_data_type=VOID;}
 };

@@ -90,3 +90,9 @@ startfor
     if 0<tmp/100 then break end;
     write tmp
 endfor
+
+{ for loop well produce error because k not declared before }
+for k from 1 to 5 inc 1
+startfor
+    write k
+endfor}
