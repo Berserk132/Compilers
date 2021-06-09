@@ -1,3 +1,3 @@
-D:/repos/Compilers/Assignment 3/cmake-build-debug/CMakeFiles/Assignment_3.dir
-D:/repos/Compilers/Assignment 3/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/repos/Compilers/Assignment 3/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+G:/FCI-CU/#4Fourth-Year/Second Term/Compilers/Assignment/Compilers/Assignment 3/cmake-build-debug/CMakeFiles/Assignment_3.dir
+G:/FCI-CU/#4Fourth-Year/Second Term/Compilers/Assignment/Compilers/Assignment 3/cmake-build-debug/CMakeFiles/edit_cache.dir
+G:/FCI-CU/#4Fourth-Year/Second Term/Compilers/Assignment/Compilers/Assignment 3/cmake-build-debug/CMakeFiles/rebuild_cache.dir

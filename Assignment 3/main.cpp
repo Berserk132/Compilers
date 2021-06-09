@@ -11,15 +11,98 @@ using namespace std;
   compute factorial
 }
 
-read x; {input an integer}
-if 0<x then {compute only if x>=1}
-  fact:=1;
-  repeat
-    fact := fact * x;
-    x:=x-1
-  until x=0;
-  write fact {output factorial}
-end
+sum:=0;
+n:=20;
+i := 0;
+j := 0;
+{ for loop to sum all odd numbers from 1 to the minimum of n and 11 }
+for i from 1 to n inc 2 startfor
+    sum:=sum+i;
+    if i=11 then break end
+endfor;
+write sum;
+
+{ infinite loop
+for i from 0 to 10 inc 0-1
+startfor
+write i
+endfor;}
+
+{ nested for loop to print from 0 to 10, n+1 times  }
+for i from 0 to 10 inc 1
+startfor
+    for j from 0 to 10 inc 1
+    startfor
+        write j
+    endfor
+endfor;
+
+
+{ for loop to calculate factorial of n }
+fact := 1;
+read n;
+for i from 1 to n inc 1
+startfor
+    fact := fact * i
+endfor;
+write fact; {factorial of a number}
+
+
+
+{ for loop to print from 10 to 1 }
+for i from 10 to 1 inc 0-1
+startfor
+    write i
+endfor;
+
+
+
+{ for loop to print from 1 to n+5 }
+read n;
+for i from 1 to n+5 inc 1
+startfor
+    write i
+endfor;
+
+
+{ for loop to break if i/2 equals 20 }
+for i from 1 to 100 inc 0
+startfor
+    if i/2=20 then break end;
+    write i;
+    i := i + 1
+endfor;
+
+
+{ nested for loop to print multiplication table }
+for i from 1 to 12 inc 1
+startfor
+    for j from 1 to 12 inc 1
+    startfor
+        write i * j
+    endfor
+endfor;
+
+
+{ nested for loop to break from the second loop if j = 5 }
+for i from 1 to 3 inc 1
+startfor
+    for j from 1 to 12 inc 1
+    startfor
+        write j;
+        if j = 5 then break end
+    endfor;
+    write i
+endfor;
+
+
+{ for loop break if tmp / 100 > 0 }
+for i from 1 to 3 inc 0
+startfor
+    read tmp;
+    if 0<tmp/100 then break end;
+    write tmp
+endfor
 */
 
 // sequence of statements separated by ;
@@ -319,14 +402,14 @@ void GetNextToken(CompilerInfo* pci, Token* ptoken)
 
 enum NodeKind{
     IF_NODE, REPEAT_NODE, ASSIGN_NODE, READ_NODE, WRITE_NODE, FOR_NODE,
-    OPER_NODE, NUM_NODE, ID_NODE
+    OPER_NODE, NUM_NODE, ID_NODE, BREAK_NODE,
 };
 
 // Used for debugging only /////////////////////////////////////////////////////////
 const char* NodeKindStr[]=
         {
                 "If", "Repeat", "Assign", "Read", "Write", "For",
-                "Oper", "Num", "ID"
+                "Oper", "Num", "ID", "Break"
         };
 
 enum ExprDataType {VOID, INTEGER, BOOLEAN};
@@ -350,6 +433,7 @@ struct TreeNode
     ExprDataType expr_data_type; // defined for expression/int/identifier only
     bool b = false;
     int line_num;
+    int line_break_num = -1;
 
     TreeNode() {int i; for(i=0;i<MAX_CHILDREN;i++) child[i]=0; sibling=0; expr_data_type=VOID;}
 };
@@ -636,6 +720,20 @@ TreeNode* ForStmt(CompilerInfo* pci, ParseInfo* ppi)
     return tree; // return the node
 }
 
+// Code Added
+TreeNode* BreakStmt(CompilerInfo* pci, ParseInfo* ppi)
+{
+    pci->debug_file.Out("Start BreakStmt");   // Declare the start of for Break statement
+
+    TreeNode* tree=new TreeNode; // create new node for Break Statement
+    tree->node_kind=BREAK_NODE;    // node kind will be Break node
+    tree->line_num=pci->in_file.cur_line_num;   // declare the number of the line
+    Match(pci, ppi, BREAK);     // skip BREAK word from the program
+
+    pci->debug_file.Out("End BreakStmt"); // Declare the end of the Break statement
+    return tree; // return the node
+}
+
 // stmt -> ifstmt | repeatstmt | assignstmt | readstmt | writestmt
 TreeNode* Stmt(CompilerInfo* pci, ParseInfo* ppi)
 {
@@ -650,6 +748,7 @@ TreeNode* Stmt(CompilerInfo* pci, ParseInfo* ppi)
     else if(ppi->next_token.type==WRITE) tree=WriteStmt(pci, ppi);
         // Code Added
     else if(ppi->next_token.type==FOR) tree= ForStmt(pci, ppi); // if the token type is FOR then invoke ForStmt function
+    else if (ppi->next_token.type==BREAK) tree= BreakStmt(pci,ppi); // if the token type is BREAK then invoke BreakStmt function
     else throw 0;
 
     pci->debug_file.Out("End Stmt");
@@ -669,8 +768,7 @@ TreeNode* StmtSeq(CompilerInfo* pci, ParseInfo* ppi)
           ppi->next_token.type!=ELSE && ppi->next_token.type!=UNTIL &&
           ppi->next_token.type!=FOR && ppi->next_token.type!=FROM &&
           ppi->next_token.type!=TO && ppi->next_token.type!=INC &&              // if token type is one of this words then we are in the end of the stmtSeq
-          ppi->next_token.type!=STARTFOR && ppi->next_token.type!=ENDFOR &&
-          ppi->next_token.type!=BREAK)
+          ppi->next_token.type!=STARTFOR && ppi->next_token.type!=ENDFOR)
     {
         Match(pci, ppi, SEMI_COLON);
         TreeNode* next_tree=Stmt(pci, ppi);
@@ -865,7 +963,8 @@ void Analyze(TreeNode* node, SymbolTable* symbol_table)
     {
         VariableInfo* variable = symbol_table->Find(node->id);
 
-        if (!variable) symbol_table->Insert(node->id, node->line_num);
+        if (variable) symbol_table->Insert(node->id, node->line_num);
+        else throw runtime_error("This var not declared before");
     }
 
     for(i=0;i<MAX_CHILDREN;i++) if(node->child[i]) Analyze(node->child[i], symbol_table);
@@ -929,7 +1028,7 @@ void RunProgram(TreeNode* node, SymbolTable* symbol_table, int* variables)
         if(cond)
         {
             if(node->child[1]) RunProgram(node->child[1], symbol_table, variables);
-            if (node->b) breakFlag= true; // if this if has break statement then set breakFlag=True
+            if (node->b) breakFlag= true; return; // if this if has break statement then set breakFlag=True and stop executing stmtSeq
         }
         else if(node->child[2]) RunProgram(node->child[2], symbol_table, variables);
     }
@@ -957,16 +1056,24 @@ void RunProgram(TreeNode* node, SymbolTable* symbol_table, int* variables)
         while(!Evaluate(node->child[1], symbol_table, variables));
     }
     // Code Added
+    if (node->node_kind==BREAK_NODE) // if node kind is break
+    {
+        breakFlag=true; // set breakFlag to true
+        return; // and stop the stmtSeq
+    }
+
+    // Code Added
     if(node->node_kind==FOR_NODE)
     {
         int from = Evaluate(node->child[0], symbol_table, variables); // get the start value of for loop
         int to = Evaluate(node->child[1], symbol_table, variables);   // get the end value of for loop
         int inc = Evaluate(node->child[2], symbol_table, variables);  // get the value of inc of for loop
-        variables[symbol_table->Find(node->id)->memloc]=from;               // set the value of for loop var to from
+        variables[symbol_table->Find(node->id)->memloc]=from;             // set the value of for loop var to from
         if (from > to) // if from > to then this is decrement for loop
         {
-            for (int i = from; i > to; i+= inc)
+            for (int i = from; i >= to; i+= inc)
             {
+
                 variables[symbol_table->Find(node->id)->memloc]=i; // set the value of for loop var to i
                 RunProgram(node->child[3], symbol_table, variables); // run the body of for loop
 
@@ -980,8 +1087,9 @@ void RunProgram(TreeNode* node, SymbolTable* symbol_table, int* variables)
         }
         else if (from < to) // if from < to then this is increment for loop
         {
-            for (int i = from; i < to; i+= inc)
+            for (int i = from; i <= to; i+= inc)
             {
+
                 variables[symbol_table->Find(node->id)->memloc]=i; // set the value of for loop var to i
                 RunProgram(node->child[3], symbol_table, variables); // run the body of for loop
 

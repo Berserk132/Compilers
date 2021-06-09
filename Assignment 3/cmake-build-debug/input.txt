@@ -1,21 +1,92 @@
 sum:=0;
 n:=20;
-for i from 1+2 to n inc 2 startfor
+i := 0;
+j := 0;
+{ for loop to sum all odd numbers from 1 to the minimum of n and 11 }
+for i from 1 to n inc 2 startfor
     sum:=sum+i;
     if i=11 then break end
 endfor;
 write sum;
 
-
-for i from 10 to 0 inc 0-1
+{ infinite loop
+for i from 0 to 10 inc 0-1
 startfor
 write i
-endfor;
+endfor;}
 
+{ nested for loop to print from 0 to 10, n+1 times  }
 for i from 0 to 10 inc 1
 startfor
     for j from 0 to 10 inc 1
     startfor
         write j
     endfor
+endfor;
+
+
+{ for loop to calculate factorial of n }
+fact := 1;
+read n;
+for i from 1 to n inc 1
+startfor
+    fact := fact * i
+endfor;
+write fact; {factorial of a number}
+
+
+
+{ for loop to print from 10 to 1 }
+for i from 10 to 1 inc 0-1
+startfor
+    write i
+endfor;
+
+
+
+{ for loop to print from 1 to n+5 }
+read n;
+for i from 1 to n+5 inc 1
+startfor
+    write i
+endfor;
+
+
+{ for loop to break if i/2 equals 20 }
+for i from 1 to 100 inc 0
+startfor
+    if i/2=20 then break end;
+    write i;
+    i := i + 1
+endfor;
+
+
+{ nested for loop to print multiplication table }
+for i from 1 to 12 inc 1
+startfor
+    for j from 1 to 12 inc 1
+    startfor
+        write i * j
+    endfor
+endfor;
+
+
+{ nested for loop to break from the second loop if j = 5 }
+for i from 1 to 3 inc 1
+startfor
+    for j from 1 to 12 inc 1
+    startfor
+        write j;
+        if j = 5 then break end
+    endfor;
+    write i
+endfor;
+
+
+{ for loop break if tmp / 100 > 0 }
+for i from 1 to 3 inc 0
+startfor
+    read tmp;
+    if 0<tmp/100 then break end;
+    write tmp
 endfor
